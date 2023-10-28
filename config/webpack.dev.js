@@ -44,8 +44,17 @@ module.exports = {
       {
         test: /\.styl$/,
         use: getStyleLoaders('stylus-loader')
-      }
+      },
       // 处理图片
+      {
+        test: /\.(png|jpe?g|gif|webp)$/,
+        type: "asset",
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
+          }
+        }
+      }
       // 处理js
     ]
   },
