@@ -55,15 +55,14 @@ module.exports = {
           }
         }
       },
-      // 处理字体图标资源
+      // 处理字体图标资源等其他资源
       {
-        test: /\.(ttf|woff2?)$/,
+        test: /\.(ttf|woff2?|map4|map3|avi)$/,
         type: "asset/resource",
         // generator: {
         //   filename: "static/media/[hash:8][ext][query]",
         // },
       },
-      // 处理其他资源
       // 处理js
     ]
   },
