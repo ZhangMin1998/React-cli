@@ -1,3 +1,5 @@
+const path = require("path")
+const ESLintWebpackPlugin = require("eslint-webpack-plugin")
 
 // 获取处理样式的Loaders
 const getStyleLoaders = (proProcessor) => {
@@ -19,6 +21,7 @@ const getStyleLoaders = (proProcessor) => {
 }
 
 module.exports = {
+  mode: 'development',
   entry: '.src/main.js',
   output: {
     path: undefined,
@@ -66,5 +69,17 @@ module.exports = {
       // 处理js
     ]
   },
-  plugins: []
+  plugins: [
+    new ESLintWebpackPlugin({
+      // 指定检查文件的根目录
+      context: path.resolve(__dirname, '../src'),
+      exclude: "node_modules", // 默认值
+      cache: true, // 开启缓存
+      // 缓存目录
+      cacheLocation: path.resolve(
+        __dirname,
+        "../node_modules/.cache/.eslintcache"
+      )
+    })
+  ]
 }
