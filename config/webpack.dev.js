@@ -1,4 +1,22 @@
 
+// 获取处理样式的Loaders
+const getStyleLoaders = (proProcessor) => {
+  return [
+    'style-loader',
+    'css-loader',
+    {
+      // 配合.browserslistrc来指定兼容程度
+      loader: "postcss-loader",
+      options: {
+        postcssOptions: {
+          plugins: [
+            "postcss-preset-env", // 能解决大多数样式兼容性问题
+          ],
+        },
+      }
+    }
+  ].filter(Boolean) // 如果没有就过滤掉
+}
 
 module.exports = {
   entry: '.src/main.js',
@@ -13,78 +31,19 @@ module.exports = {
       // 处理css
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            // 配合.browserslistrc来指定兼容程度
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  "postcss-preset-env", // 能解决大多数样式兼容性问题
-                ],
-              },
-            }
-          }
-        ]
+        use: getStyleLoaders()
       },
       {
         test: /\.less$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            // 配合.browserslistrc来指定兼容程度
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  "postcss-preset-env", // 能解决大多数样式兼容性问题
-                ],
-              },
-            }
-          },
-          'less-loader'
-        ]
+        use: getStyleLoaders('less-loader')
       },
       {
         test: /\.s[ac]ss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            // 配合.browserslistrc来指定兼容程度
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  "postcss-preset-env", // 能解决大多数样式兼容性问题
-                ],
-              },
-            }
-          },
-          'sass-loader'
-        ]
+        use: getStyleLoaders('sass-loader')
       },
       {
         test: /\.styl$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            // 配合.browserslistrc来指定兼容程度
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [
-                  "postcss-preset-env", // 能解决大多数样式兼容性问题
-                ],
-              },
-            }
-          },
-          'stylus-loader'
-        ]
+        use: getStyleLoaders('stylus-loader')
       }
       // 处理图片
       // 处理js
