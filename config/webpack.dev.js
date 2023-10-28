@@ -23,8 +23,8 @@ module.exports = {
   output: {
     path: undefined,
     filename: 'static/js/[name].js',
-    chunkFilename: "static/js/[name].chunk.js",
-    assetModuleFilename: "static/js/[hash:8][ext][query]"
+    chunkFilename: "static/js/[name].chunk.js", // 动态导入输出资源命名方式
+    assetModuleFilename: 'static/media/[name].[hash:8][ext]', // 图片、字体等资源命名方式（注意用hash）
   },
   module:{
     rules: [
@@ -54,7 +54,16 @@ module.exports = {
             maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
           }
         }
-      }
+      },
+      // 处理字体图标资源
+      {
+        test: /\.(ttf|woff2?)$/,
+        type: "asset/resource",
+        // generator: {
+        //   filename: "static/media/[hash:8][ext][query]",
+        // },
+      },
+      // 处理其他资源
       // 处理js
     ]
   },
