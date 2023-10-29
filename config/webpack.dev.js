@@ -18,7 +18,8 @@ const getStyleLoaders = (proProcessor) => {
           ],
         },
       }
-    }
+    },
+    proProcessor,
   ].filter(Boolean) // 如果没有就过滤掉
 }
 
@@ -34,55 +35,59 @@ module.exports = {
   },
   module:{
     rules: [
-      // 处理css
       {
-        test: /\.css$/,
-        use: getStyleLoaders()
-      },
-      {
-        test: /\.less$/,
-        use: getStyleLoaders('less-loader')
-      },
-      {
-        test: /\.s[ac]ss$/,
-        use: getStyleLoaders('sass-loader')
-      },
-      {
-        test: /\.styl$/,
-        use: getStyleLoaders('stylus-loader')
-      },
-      // 处理图片
-      {
-        test: /\.(png|jpe?g|gif|webp)$/,
-        type: "asset",
-        parser: {
-          dataUrlCondition: {
-            maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
+        oneOf: [
+          // 处理css
+          {
+            test: /\.css$/,
+            use: getStyleLoaders()
+          },
+          {
+            test: /\.less$/,
+            use: getStyleLoaders('less-loader')
+          },
+          {
+            test: /\.s[ac]ss$/,
+            use: getStyleLoaders('sass-loader')
+          },
+          {
+            test: /\.styl$/,
+            use: getStyleLoaders('stylus-loader')
+          },
+          // 处理图片
+          {
+            test: /\.(png|jpe?g|gif|webp)$/,
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
+              }
+            }
+          },
+          // 处理字体图标资源等其他资源
+          {
+            test: /\.(ttf|woff2?|map4|map3|avi)$/,
+            type: "asset/resource",
+            // generator: {
+            //   filename: "static/media/[hash:8][ext][query]",
+            // },
+          },
+          // 处理js
+          {
+            test: /\.jsx?$/, // js jsx
+            // exclude: /node_modules/, // 排除node_modules代码不编译
+            include: path.resolve(__dirname, '../src'),
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true, // 开启babel编译缓存
+              cacheCompression: false, // 缓存文件不要压缩
+              plugins: [
+                'react-refresh/babel' // 激活js的HMR 
+              ]
+              // plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积 react-app内置了
+            }
           }
-        }
-      },
-      // 处理字体图标资源等其他资源
-      {
-        test: /\.(ttf|woff2?|map4|map3|avi)$/,
-        type: "asset/resource",
-        // generator: {
-        //   filename: "static/media/[hash:8][ext][query]",
-        // },
-      },
-      // 处理js
-      {
-        test: /\.jsx?$/, // js jsx
-        // exclude: /node_modules/, // 排除node_modules代码不编译
-        include: path.resolve(__dirname, '../src'),
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true, // 开启babel编译缓存
-          cacheCompression: false, // 缓存文件不要压缩
-          plugins: [
-            'react-refresh/babel' // 激活js的HMR 
-          ]
-          // plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积 react-app内置了
-        }
+        ]
       }
     ]
   },

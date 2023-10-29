@@ -27,13 +27,30 @@ const getStyleLoaders = (proProcessor) => {
           ],
         },
       }
-    }
+    },
+    proProcessor && {
+      loader: proProcessor,
+      options:
+        proProcessor === "less-loader"
+          ? {
+              // antd的自定义主题
+              lessOptions: {
+                modifyVars: {
+                  // 其他主题色：https://ant.design/docs/react/customize-theme-cn
+                  "@primary-color": "#1DA57A", // 全局主色
+                },
+                javascriptEnabled: true,
+              },
+            }
+          : {},
+    },
   ].filter(Boolean) // 如果没有就过滤掉
 }
 
 module.exports = {
   mode: isProduction  ? 'production' : 'development',// 默认生产模式已经开启了：html 压缩和 js 压缩
   devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
+  performance: false, // 关闭性能分析，提示速度
   entry: './src/main.js',
   output: {
     path: isProduction ? path.resolve(__dirname, "../dist") : undefined,
@@ -44,55 +61,59 @@ module.exports = {
   },
   module:{
     rules: [
-      // 处理css
       {
-        test: /\.css$/,
-        use: getStyleLoaders()
-      },
-      {
-        test: /\.less$/,
-        use: getStyleLoaders('less-loader')
-      },
-      {
-        test: /\.s[ac]ss$/,
-        use: getStyleLoaders('sass-loader')
-      },
-      {
-        test: /\.styl$/,
-        use: getStyleLoaders('stylus-loader')
-      },
-      // 处理图片
-      {
-        test: /\.(png|jpe?g|gif|webp)$/,
-        type: "asset",
-        parser: {
-          dataUrlCondition: {
-            maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
+        oneOf: [
+          // 处理css
+          {
+            test: /\.css$/,
+            use: getStyleLoaders()
+          },
+          {
+            test: /\.less$/,
+            use: getStyleLoaders('less-loader')
+          },
+          {
+            test: /\.s[ac]ss$/,
+            use: getStyleLoaders('sass-loader')
+          },
+          {
+            test: /\.styl$/,
+            use: getStyleLoaders('stylus-loader')
+          },
+          // 处理图片
+          {
+            test: /\.(png|jpe?g|gif|webp)$/,
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                maxSize: 10 * 1024 // 小于10kb的图片会被base64处理
+              }
+            }
+          },
+          // 处理字体图标资源等其他资源
+          {
+            test: /\.(ttf|woff2?|map4|map3|avi)$/,
+            type: "asset/resource",
+            // generator: {
+            //   filename: "static/media/[hash:8][ext][query]",
+            // },
+          },
+          // 处理js
+          {
+            test: /\.jsx?$/, // js jsx
+            // exclude: /node_modules/, // 排除node_modules代码不编译
+            include: path.resolve(__dirname, '../src'),
+            loader: 'babel-loader',
+            options: {
+              cacheDirectory: true, // 开启babel编译缓存
+              cacheCompression: false, // 缓存文件不要压缩
+              plugins: [
+                !isProduction && 'react-refresh/babel' // 激活js的HMR 
+              ].filter(Boolean)
+              // plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积 react-app内置了
+            }
           }
-        }
-      },
-      // 处理字体图标资源等其他资源
-      {
-        test: /\.(ttf|woff2?|map4|map3|avi)$/,
-        type: "asset/resource",
-        // generator: {
-        //   filename: "static/media/[hash:8][ext][query]",
-        // },
-      },
-      // 处理js
-      {
-        test: /\.jsx?$/, // js jsx
-        // exclude: /node_modules/, // 排除node_modules代码不编译
-        include: path.resolve(__dirname, '../src'),
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true, // 开启babel编译缓存
-          cacheCompression: false, // 缓存文件不要压缩
-          plugins: [
-            !isProduction && 'react-refresh/babel' // 激活js的HMR 
-          ].filter(Boolean)
-          // plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积 react-app内置了
-        }
+        ]
       }
     ]
   },
@@ -140,6 +161,36 @@ module.exports = {
     // 代码分割配置
     splitChunks: {
       chunks: "all", // 对所有模块都进行分割
+      cacheGroups: {
+        // layouts通常是admin项目的主体布局组件，所有路由组件都要使用的
+        // 可以单独打包，从而复用
+        // 如果项目中没有，请删除
+        // layouts: {
+        //   name: "layouts",
+        //   test: path.resolve(__dirname, "../src/layouts"),
+        //   priority: 40,
+        // },
+        // react react-dom react-router-dom 一起打包
+        react: {
+          test: /[\\/]node_modules[\\/]react(.*)?[\\/]/,
+          name: "chunk-react",
+          chunks: "initial",
+          priority: 40,
+        },
+        // antd 单独打包
+        antd: {
+          test: /[\\/]node_modules[\\/]antd(.*)/,
+          name: "chunk-antd",
+          priority: 30,
+        },
+        // 剩下node_modules单独打包
+        libs: {
+          name: "chunk-libs",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10, // 权重最低，优先考虑前面内容
+          chunks: "initial",
+        }
+      }
     },
     // 提取runtime文件 将 hash 值单独保管在一个 runtime 文件中
     runtimeChunk: {
@@ -181,7 +232,7 @@ module.exports = {
   },
   // webpack解析模块加载选项
   resolve: {
-    extensions: [".jsx", ".js", ".json"], // 自动补全文件扩展名，让jsx可以使用
+    extensions: [".jsx", ".js", ".json", ".less"], // 自动补全文件扩展名，让jsx可以使用
   },
   // 开发服务器 开发环境配置 自动编译
   devServer: {
