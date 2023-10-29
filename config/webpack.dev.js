@@ -22,6 +22,8 @@ const getStyleLoaders = (proProcessor) => {
 }
 
 module.exports = {
+  mode: 'development',
+  devtool: 'cheap-module-source-map',
   entry: '.src/main.js',
   output: {
     path: undefined,
