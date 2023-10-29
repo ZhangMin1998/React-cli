@@ -24,7 +24,7 @@ const getStyleLoaders = (proProcessor) => {
 module.exports = {
   mode: 'development',
   devtool: 'cheap-module-source-map',
-  entry: '.src/main.js',
+  entry: './src/main.js',
   output: {
     path: undefined,
     filename: 'static/js/[name].js',
@@ -107,6 +107,10 @@ module.exports = {
     runtimeChunk: {
       name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
     }
+  },
+  // webpack解析模块加载选项
+  resolve: {
+    extensions: [".jsx", ".js", ".json"], // 自动补全文件扩展名，让jsx可以使用
   },
   // 开发服务器 开发环境配置 自动编译
   devServer: {
