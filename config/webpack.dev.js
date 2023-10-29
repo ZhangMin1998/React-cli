@@ -72,7 +72,7 @@ module.exports = {
       {
         test: /\.jsx?$/, // js jsx
         // exclude: /node_modules/, // 排除node_modules代码不编译
-        include: path(__dirname, '../src'),
+        include: path.resolve(__dirname, '../src'),
         loader: 'babel-loader',
         options: {
           cacheDirectory: true, // 开启babel编译缓存
@@ -98,10 +98,21 @@ module.exports = {
       template: path.resolve(__dirname, '../public/index.html')
     })
   ],
-  optmization: {
+  optimization: {
     // 代码分割配置
     splitChunks: {
       chunks: "all", // 对所有模块都进行分割
+    },
+    // 提取runtime文件 将 hash 值单独保管在一个 runtime 文件中
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
     }
+  },
+  // 开发服务器 开发环境配置 自动编译
+  devServer: {
+    host: "localhost", // 启动服务器域名
+    port: "3001", // 启动服务器端口号
+    open: true, // 是否自动打开浏览器
+    hot: true // HMR
   }
 }
