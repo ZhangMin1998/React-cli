@@ -1,5 +1,6 @@
 const path = require("path")
 const ESLintWebpackPlugin = require("eslint-webpack-plugin")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 // 获取处理样式的Loaders
 const getStyleLoaders = (proProcessor) => {
@@ -21,7 +22,6 @@ const getStyleLoaders = (proProcessor) => {
 }
 
 module.exports = {
-  mode: 'development',
   entry: '.src/main.js',
   output: {
     path: undefined,
@@ -91,6 +91,9 @@ module.exports = {
         __dirname,
         "../node_modules/.cache/.eslintcache"
       )
+    }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, '../public/index.html')
     })
   ]
 }
