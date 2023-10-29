@@ -97,5 +97,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../public/index.html')
     })
-  ]
+  ],
+  optmization: {
+    // 代码分割配置
+    splitChunks: {
+      chunks: "all", // 对所有模块都进行分割
+    }
+  }
 }
