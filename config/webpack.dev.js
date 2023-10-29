@@ -122,6 +122,7 @@ module.exports = {
     host: "localhost", // 启动服务器域名
     port: "3001", // 启动服务器端口号
     open: true, // 是否自动打开浏览器
-    hot: true // HMR
+    hot: true, // HMR
+    historyApiFallback: true, // 解决前端路由404问题
   }
 }
