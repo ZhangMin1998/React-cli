@@ -67,6 +67,17 @@ module.exports = {
         // },
       },
       // 处理js
+      {
+        test: /\.jsx?$/, // js jsx
+        // exclude: /node_modules/, // 排除node_modules代码不编译
+        include: path(__dirname, '../src'),
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true, // 开启babel编译缓存
+          cacheCompression: false, // 缓存文件不要压缩
+          // plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积 react-app内置了
+        }
+      }
     ]
   },
   plugins: [
